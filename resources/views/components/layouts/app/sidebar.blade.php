@@ -17,6 +17,9 @@
                 </flux:navlist.group>
             </flux:navlist>
 
+{{--            For testing purposes so far--}}
+{{--            @livewire('department-form')--}}
+
             <flux:spacer />
 
             <flux:navlist variant="outline">

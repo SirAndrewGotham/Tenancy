@@ -2,16 +2,32 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Concerns\BelongsToTenant;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Scopes\TenantScope;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes, BelongsToTenant;
+
+//    protected static function booted()
+//    {
+////        static::addGlobalScope(new TenantScope());
+//
+//        static::creating(function (User $user) {
+//            if (auth()->check())
+//            {
+//                $user->tenant_id = auth()->user()->tenant_id;
+//            }
+//        });
+//    }
 
     /**
      * The attributes that are mass assignable.

@@ -1,17 +1,17 @@
 <?php
 
-namespace Database\Seeders;
+namespace {{ namespace }};
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class TenantSeeder extends Seeder
+class {{ class }} extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        // Tenant::factory()->hasUsers(5)->create();
+        //
     }
 }
