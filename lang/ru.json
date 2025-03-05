@@ -1,0 +1,20 @@
+{
+    "Log in to your account": "Авторизация в системе",
+    "Enter your email and password below to log in": "Для входа в систему, введите ваши адрес электрононой почты и пароль",
+    "Email address": "Email",
+    "email@example.com": "email@example.ru",
+    "Password": "Пароль",
+    "Forgot your password?": "Забыли пароль?",
+    "Remember me": "Запомнить",
+    "Log in": "Авторизоваться",
+    "Sign up": "Зарегистрироваться",
+    "Register": "Зарегистрироваться",
+    "Don't have an account?": "Нет регистрации?",
+    "Create an account": "Регистрация учетной записи",
+    "Enter your details below to create your account": "Введите свои данные, чтобы создать учетную запись",
+    "Name": "Имя",
+    "Full name": "Полное имя",
+    "Confirm password": "Подтвердите пароль",
+    "Create account": "Зарегистрировать учетную запись",
+    "Already have an account?": "Уже зарегистрировались?"
+}

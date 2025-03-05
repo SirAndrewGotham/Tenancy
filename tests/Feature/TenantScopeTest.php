@@ -4,13 +4,14 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase, Illuminate\Foundation\Testing\WithFaker;
 
 test('a model has a tenant id on the migration', function () {
+    // create model and migration
     $now = now();
-    dd($now->year . '_' . $now->format('m') . '_' . $now->format('d') . '_' . $now->format('h') . $now->format('i') . $now->format('s') . '_create_tests_table.php');
     $this->artisan('make:model Test -m');
-    $filename = $now->year . '_' . $now->format('m') . '_' . $now->format('d') . '_' . $now->format('h') . $now->format('i') . $now->format('s') . '_create_tests_table.php';
-    $this->assertTrue(File::exists(database_path('migrations/'.$filename))); // migrations are named differently
-    $this->assertStringContainsString('$table->unsignedBigInteger(\'tenant_id\')->index();', File::get(database_path('migrations/'.$filename)));
-    //clean up
+    $filename = $now->format('Y_m_d_His').'_create_tests_table.php';
+    // assertions
+    $this->assertTrue(File::exists(database_path('migrations/'.$filename)));
+    $this->assertStringContainsString('$table->foreignIdFor(Tenant::class)->constrained()->restrictOnDelete()->index();', File::get(database_path('migrations/'.$filename)));
+    // clean up
     File::delete(database_path('migrations/'.$filename));
     File::delete(app_path('Models/Test.php'));
 });
