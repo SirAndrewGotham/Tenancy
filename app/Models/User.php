@@ -17,17 +17,20 @@ class User extends Authenticatable implements MustVerifyEmail
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, SoftDeletes, BelongsToTenant;
 
-//    protected static function booted()
-//    {
-////        static::addGlobalScope(new TenantScope());
-//
-//        static::creating(function (User $user) {
-//            if (auth()->check())
-//            {
-//                $user->tenant_id = auth()->user()->tenant_id;
-//            }
-//        });
-//    }
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        self::creating(function ($model) {
+            $slug = Str::slug($model->name);
+            $originalSlug = $slug;
+            $count = 2;
+            while (static::whereSlug($slug)->exists()) {
+                $slug = $originalSlug . '-' . $count++;
+            }
+            $model->slug = $slug;
+        });
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -36,8 +39,11 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $fillable = [
         'name',
+        'slug',
+        'role',
         'email',
         'password',
+        'tenant_id',
     ];
 
     /**
