@@ -3,5 +3,6 @@
     <flux:subheading size="lg" class="mb-6">
         {{ __('Manage your team') }}
     </flux:subheading>
+
     <flux:separator variant="subtle" />
 </div>

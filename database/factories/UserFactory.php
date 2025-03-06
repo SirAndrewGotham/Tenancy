@@ -26,10 +26,15 @@ class UserFactory extends Factory
     {
         $name = fake()->unique()->name();
         return [
+            'super' => false,
             'tenant_id' => Tenant::factory(),
             'name' => $name,
             'slug' => Str::slug($name),
             'role' => 'admin',
+            'photo' => null,
+            'department' => fake()->sentence(2),
+            'title' => fake()->jobTitle,
+            'status' => 1,
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),

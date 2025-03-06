@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -78,5 +79,52 @@ class User extends Authenticatable implements MustVerifyEmail
             ->explode(' ')
             ->map(fn (string $name) => Str::of($name)->substr(0, 1))
             ->implode('');
+    }
+
+
+
+
+
+    public function avatarUrl()
+    {
+        if($this->photo) {
+            return Storage::disk('s3-public')->url($this->photo);
+        }
+        return 'https://api.dicebear.com/9.x/initials/svg?seed=' . $this->name;
+    }
+
+    public static function search($query)
+    {
+        return empty($query) ? static::query()
+            : static::where('name', 'like', '%'.$query.'%')
+                ->orWhere('email', 'like', '%'.$query.'%');
+    }
+
+    public function isAdmin()
+    {
+        return $this->role == 'Admin';
+    }
+
+    public function isHR()
+    {
+        return $this->role == 'Human Resources';
+    }
+
+    public function applicationUrl()
+    {
+        if($this->application()) {
+            return url('/documents/' . $this->id . '/' . $this->application()->filename);
+        }
+        return '#';
+    }
+
+    public function application()
+    {
+        return $this->documents()->where('type', 'application')->first();
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(Document::class);
     }
 }

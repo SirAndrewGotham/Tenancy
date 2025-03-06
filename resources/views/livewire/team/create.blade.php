@@ -7,13 +7,13 @@ new class extends Component
 {
     use \Livewire\WithFileUploads;
 
-    public $name = 'Andrew Gotham';
-    public $email = 'andreogotema@gmail.com';
-    public $department = 'information_technology';
-    public $title = 'CIO';
+    public $name = 'New user name';
+    public $email = 'Email address';
+    public $department = 'Department user belongs to';
+    public $title = 'User title';
     public $photo;
     public $status = 1;
-    public $role = 'admin';
+    public $role = 'User role';
 
     public function save()
     {
@@ -63,20 +63,30 @@ new class extends Component
             <div class="mt-5 md:mt-0 md:col-span-2">
                 <form wire:submit.prevent="submit">
                     <div class="grid grid-cols-6 gap-6">
-                        <x-text-input
-                            wire:model="name"
-                            label="Name"
-                            :required="true"
-                            placeholder="Jeffrey Way"
-                            class="col-span-6 sm:col-span-3"/>
+                        <flux:field class="col-span-6 sm:col-span-3">
+                            <flux:label>Name</flux:label>
+                            <flux:input wire:model="name" type="text" />
+                            <flux:error name="name" />
+                        </flux:field>
+{{--                        <x-text-input--}}
+{{--                            wire:model="name"--}}
+{{--                            label="Name"--}}
+{{--                            :required="true"--}}
+{{--                            placeholder="Jeffrey Way"--}}
+{{--                            class="col-span-6 sm:col-span-3"/>--}}
 
-                        <x-text-input
-                            wire:model="email"
-                            type="email"
-                            label="Email"
-                            :required="true"
-                            placeholder="jeffrey@laracasts.com"
-                            class="col-span-6 sm:col-span-3"/>
+                        <flux:field class="col-span-6 sm:col-span-3">
+                            <flux:label>Email</flux:label>
+                            <flux:input wire:model="email" type="text" />
+                            <flux:error name="email" />
+                        </flux:field>
+{{--                        <x-text-input--}}
+{{--                            wire:model="email"--}}
+{{--                            type="email"--}}
+{{--                            label="Email"--}}
+{{--                            :required="true"--}}
+{{--                            placeholder="jeffrey@laracasts.com"--}}
+{{--                            class="col-span-6 sm:col-span-3"/>--}}
 
                         <div class="col-span-6 sm:col-span-2">
                             <label for="department" class="block text-sm font-medium leading-5 text-gray-700">Department</label>
@@ -89,12 +99,17 @@ new class extends Component
                             </select>
                         </div>
 
-                        <x-text-input
-                            wire:model="title"
-                            label="Title"
-                            :required="true"
-                            placeholder="Instructor"
-                            class="col-span-6 sm:col-span-3"/>
+                        <flux:field class="col-span-6 sm:col-span-3">
+                            <flux:label>Title</flux:label>
+                            <flux:input wire:model="title" type="text" />
+                            <flux:error name="title" />
+                        </flux:field>
+{{--                        <x-text-input--}}
+{{--                            wire:model="title"--}}
+{{--                            label="Title"--}}
+{{--                            :required="true"--}}
+{{--                            placeholder="Instructor"--}}
+{{--                            class="col-span-6 sm:col-span-3"/>--}}
 
                         <div class="col-span-6">
                             <label class="block text-sm leading-5 font-medium text-gray-700 mb-2">
@@ -117,9 +132,9 @@ new class extends Component
                                 </div>
                                 <div>
                                     <input type="file" wire:model="photo">
-
-                                    @error('photo') <span class="error">{{ $message }}</span> @enderror
-
+                                    @error('photo')
+                                        <span class="error">{{ $message }}</span>
+                                    @enderror
                                     <button wire:click="save">Save Photo</button>
                                 </div>
                             </div>
