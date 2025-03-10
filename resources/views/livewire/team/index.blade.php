@@ -9,15 +9,15 @@ new class extends Component {
 
     use WithPagination;
 
-    public $perPage = 10;
-    public $sortField = 'name';
-    public $sortAsc = true;
-    public $search = '';
-    public $super;
-    public $tenants;
+    public int $perPage = 5;
+    public string $sortField = 'name';
+    public bool $sortAsc = true;
+    public string $search = '';
+    public bool $super;
+    public array $tenants;
     public $selectedTenant;
 
-    public function sortBy($field)
+    public function sortBy($field): void
     {
         if ($this->sortField === $field) {
             $this->sortAsc = !$this->sortAsc;
@@ -28,13 +28,24 @@ new class extends Component {
         $this->sortField = $field;
     }
 
+    public function showUsers()
+    {
+        $query = User::search($this->search)
+            ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc');
+        if ($this->super && $this->selectedTenant) {
+            $query->where('tenant_id', $this->selectedTenant);
+        }
+
+        return $query->paginate($this->perPage);
+    }
+
     public function impersonate($userId)
     {
         if (!auth()->user()->super) {
             return;
         }
 
-//        auth()->user()->impersonate($userId);
+        auth()->user()->impersonate($userId);
         $originalId = auth()->user()->id;
         session()->put('impersonate', $originalId);
         auth()->loginUsingId($userId);
@@ -42,7 +53,7 @@ new class extends Component {
         return redirect('/team');
     }
 
-    public function mount()
+    public function mount(): void
     {
         $this->super = false;
         if (auth()->user()->super) {
@@ -51,16 +62,23 @@ new class extends Component {
         }
     }
 
+    public function updatingPerPage(): void
+    {
+        $this->resetPage();
+    }
+
     public function render(): mixed
     {
-        $query = User::search($this->search)
-            ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc');
-        if ($this->super && $this->selectedTenant) {
-            $query->where('tenant_id', $this->selectedTenant);
-        }
+//        $query = User::search($this->search)
+//            ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc');
+//        if ($this->super && $this->selectedTenant) {
+//            $query->where('tenant_id', $this->selectedTenant);
+//        }
 
         return view('livewire.team.index', [
-            'users' => $query->with('documents')->paginate($this->perPage),
+//            'users' => $query->with('documents')->paginate($this->perPage),
+//            'users' => $query->paginate($this->perPage),
+            'users' => $this->showUsers(),
         ]);
     }
 
@@ -72,17 +90,43 @@ new class extends Component {
     {{-- Team section index heading --}}
     <div class="grid grid-cols-6 mb-4">
         <div class="col-span-6 sm:col-span-1 pr-2">
-            <flux:dropdown>
-                <flux:button icon-trailing="chevron-down">Per Page</flux:button>
+{{--            <flux:dropdown>--}}
+{{--                <flux:button icon-trailing="chevron-down">{{ __('Per Page') }}</flux:button>--}}
 
-                <flux:menu>
-                    <flux:menu.radio.group>
-                        <flux:menu.radio checked>10</flux:menu.radio>
-                        <flux:menu.radio>15</flux:menu.radio>
-                        <flux:menu.radio>20</flux:menu.radio>
-                    </flux:menu.radio.group>
-                </flux:menu>
-            </flux:dropdown>
+{{--                <flux:menu>--}}
+{{--                    <flux:menu.radio.group>--}}
+{{--                        <flux:menu.radio checked>10</flux:menu.radio>--}}
+{{--                        <flux:menu.radio>15</flux:menu.radio>--}}
+{{--                        <flux:menu.radio>20</flux:menu.radio>--}}
+{{--                    </flux:menu.radio.group>--}}
+{{--                </flux:menu>--}}
+{{--            </flux:dropdown>--}}
+
+            <flux:select
+                wire:model.live="perPage"
+                placeholder="{{ __('Per page') }}"
+            >
+                <flux:select.option value="5">5</flux:select.option>
+                <flux:select.option value="10">10</flux:select.option>
+                <flux:select.option value="15">15</flux:select.option>
+                <flux:select.option value="20">20</flux:select.option>
+                <flux:select.option value="50">50</flux:select.option>
+            </flux:select>
+
+
+
+{{--            <flux:select variant="listbox">--}}
+{{--                <x-slot name="button">--}}
+{{--                    <flux:select.button class="rounded-full!" placeholder="{{ __('Per page') }}" :invalid="$errors->has('...')" />--}}
+{{--                </x-slot>--}}
+
+{{--                <flux:select.option>5</flux:select.option>--}}
+{{--                <flux:select.option>10</flux:select.option>--}}
+{{--                <flux:select.option>15</flux:select.option>--}}
+{{--                <flux:select.option>20</flux:select.option>--}}
+{{--                <flux:select.option>25</flux:select.option>--}}
+{{--                <flux:select.option>50</flux:select.option>--}}
+{{--            </flux:select>--}}
         </div>
         {{--        <div class="col-span-6 sm:col-span-1 pr-2">--}}
         {{--            <label for="location" class="block text-sm leading-5 font-medium text-gray-700">Per Page</label>--}}
@@ -97,7 +141,7 @@ new class extends Component {
         @if($super)
             <div class="col-span-6 sm:col-span-2 pr-2">
                 <flux:dropdown>
-                    <flux:button icon-trailing="chevron-down">Choose a Tenant</flux:button>
+                    <flux:button icon-trailing="chevron-down">{{ __('Choose a Tenant') }}</flux:button>
 
                     <flux:menu>
                         @foreach($tenants as $key => $tenant)
@@ -134,12 +178,12 @@ new class extends Component {
 
         <div class="col-span-6 {{$super == true ? 'sm:col-span-3' : 'sm:col-span-5'}}">
             <flux:field>
-                <flux:input wire:model="search" placeholder="Search team members..." />
+                <flux:input wire:model.live="search" placeholder="{{ __('Search team members...') }}"/>
             </flux:field>
         </div>
 
         {{--        <div class="col-span-6 {{$super == true ? 'sm:col-span-3' : 'sm:col-span-5'}}">--}}
-        {{--            <x-text-input wire:model="search" label="Search" placeholder="Search Users..."/>--}}
+        {{--            <x-text-input wire:model="search" label="Search" placeholder="{{ __('Search team members...') }}"/>--}}
         {{--        </div>--}}
     </div>
     {{--// Team section index heading --}}
@@ -153,11 +197,16 @@ new class extends Component {
                         <table class="min-w-full">
                             <thead>
                             <tr>
-                                <x-th label="Name" value="name" :canSort="true" :sortField="$sortField" :sortAsc="$sortAsc" />
-                                <x-th label="Title" value="title" :canSort="true" :sortField="$sortField" :sortAsc="$sortAsc" />
-                                <x-th label="Status" value="status" :canSort="false" :sortField="$sortField" :sortAsc="$sortAsc" />
-                                <x-th label="Role" value="role" :canSort="true" :sortField="$sortField" :sortAsc="$sortAsc" />
-                                <x-th label="Application" value="application" :canSort="false" :sortField="$sortField" :sortAsc="$sortAsc" />
+                                <x-th label="Name" value="name" :canSort="true" :sortField="$sortField"
+                                      :sortAsc="$sortAsc"/>
+                                <x-th label="Title" value="title" :canSort="true" :sortField="$sortField"
+                                      :sortAsc="$sortAsc"/>
+                                <x-th label="Status" value="status" :canSort="false" :sortField="$sortField"
+                                      :sortAsc="$sortAsc"/>
+                                <x-th label="Role" value="role" :canSort="true" :sortField="$sortField"
+                                      :sortAsc="$sortAsc"/>
+                                <x-th label="Application" value="application" :canSort="false" :sortField="$sortField"
+                                      :sortAsc="$sortAsc"/>
                                 <th class="px-6 py-3 border-b border-gray-200 bg-gray-50">
                             <span class="flex rounded-md justify-end">
                                 <a href="{{route('users.create')}}" type="button"
@@ -184,7 +233,8 @@ new class extends Component {
                                                         {{ $user->name }}
                                                     </span>
                                                     @if($super && $user->id != auth()->id())
-                                                        <a wire:click="impersonate({{  $user->id }})" href="#" class="text-xs text-indigo-600 ml-1">
+                                                        <a wire:click="impersonate({{  $user->id }})" href="#"
+                                                           class="text-xs text-indigo-600 ml-1">
                                                             Impersonate
                                                         </a>
                                                     @endif
@@ -218,7 +268,8 @@ new class extends Component {
                                     <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
                                         <div class="flex justify-center">
                                             @if($application = $user->documents->where('type', 'application')->first())
-                                                <a href="{{$application->privateUrl()}}" target="_blank">{{--open new window svg--}}
+                                                <a href="{{$application->privateUrl()}}"
+                                                   target="_blank">{{--open new window svg--}}
                                                     <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 20 20">
                                                         <path
                                                             d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>

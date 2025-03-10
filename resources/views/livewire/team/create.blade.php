@@ -7,17 +7,17 @@ new class extends Component
 {
     use \Livewire\WithFileUploads;
 
-    public $name = 'New user name';
-    public $email = 'Email address';
-    public $department = 'Department user belongs to';
-    public $title = 'User title';
+    public $name;
+    public $email;
+    public $department;
+    public $title;
     public $photo;
     public $status = 1;
-    public $role = 'User role';
+    public $role;
 
     public function save()
     {
-        $this->photo->store(path: 'photos');
+        $this->photo->store(path: 'user');
     }
 
     public function submit()
@@ -25,28 +25,34 @@ new class extends Component
         $this->validate([
             'name' => 'required|string',
             'email' => 'required|email|unique:users',
-            'department' => 'required|string',
-            'title' => 'required|string',
-            'status' => 'required|boolean',
-            'role' => 'required|string',
-            'photo' => 'image|max:1024', // 1MB Max
+//            'department' => 'required|string',
+//            'title' => 'required|string',
+//            'status' => 'required|boolean',
+//            'role' => 'required|string',
+            'photo' => 'nullable|image|max:1024', // 1MB Max
         ]);
 
-        if($this->photo)
-        {
-            $filename = $this->photo->store('photos', 's3-public');
-        }
-
-        User::create(['name' => $this->name,
+//        dd(request()->validated());
+        $user = User::create(['name' => $this->name,
         'email' => $this->email,
         'department' => $this->department,
         'title' => $this->title,
         'status' => $this->status,
         'role' => $this->role,
-        'photo' => $filename,
+//        'photo' => $filename,
         'password' => bcrypt(Str::random(16)),]);
 
-        session()->flash('success', 'We Did It');
+        if($this->photo)
+        {
+//            $filename = $this->photo->store('photos', 's3-public');
+            $filename = $this->photo->store('photos/'.$user->id, 'user');
+        }
+
+        $user->update(['photo' => $filename]);
+
+        session()->flash('success', 'New member successfully added to your team.');
+
+        $this->redirect(route('team', absolute: false), navigate: true);
     }
 }; ?>
 
@@ -65,7 +71,7 @@ new class extends Component
                     <div class="grid grid-cols-6 gap-6">
                         <flux:field class="col-span-6 sm:col-span-3">
                             <flux:label>Name</flux:label>
-                            <flux:input wire:model="name" type="text" />
+                            <flux:input wire:model="name" type="text" placeholder="{{ __('New user name') }}" />
                             <flux:error name="name" />
                         </flux:field>
 {{--                        <x-text-input--}}
@@ -77,7 +83,7 @@ new class extends Component
 
                         <flux:field class="col-span-6 sm:col-span-3">
                             <flux:label>Email</flux:label>
-                            <flux:input wire:model="email" type="text" />
+                            <flux:input wire:model="email" type="text" placeholder="{{__('Email address') }}" />
                             <flux:error name="email" />
                         </flux:field>
 {{--                        <x-text-input--}}
@@ -92,7 +98,7 @@ new class extends Component
                             <label for="department" class="block text-sm font-medium leading-5 text-gray-700">Department</label>
                             <select wire:model="department"
                                     id="department"
-                                    class="mt-1 block form-select w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5">
+                                    class="mt-1 block form-select w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5" palceholder="{{ __('Department user belongs to') }}">
                                 <option value="human_resources">Human Resources</option>
                                 <option value="marketing">Marketing</option>
                                 <option value="information_technology">Information Technology</option>
@@ -101,7 +107,7 @@ new class extends Component
 
                         <flux:field class="col-span-6 sm:col-span-3">
                             <flux:label>Title</flux:label>
-                            <flux:input wire:model="title" type="text" />
+                            <flux:input wire:model="title" type="text" placeholder="{{ __('User title') }}" />
                             <flux:error name="title" />
                         </flux:field>
 {{--                        <x-text-input--}}
@@ -135,7 +141,7 @@ new class extends Component
                                     @error('photo')
                                         <span class="error">{{ $message }}</span>
                                     @enderror
-                                    <button wire:click="save">Save Photo</button>
+{{--                                    <button wire:click="save">Save Photo</button>--}}
                                 </div>
                             </div>
                         </div>

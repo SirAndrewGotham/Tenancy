@@ -88,7 +88,8 @@ class User extends Authenticatable implements MustVerifyEmail
     public function avatarUrl()
     {
         if($this->photo) {
-            return Storage::disk('s3-public')->url($this->photo);
+//            return Storage::disk('s3-public')->url($this->photo);
+            return Storage::disk('user')->url($this->photo);
         }
         return 'https://api.dicebear.com/9.x/initials/svg?seed=' . $this->name;
     }
